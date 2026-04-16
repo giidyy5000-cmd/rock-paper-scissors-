@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rock Paper Scissors</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2f;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .choices button {
+      font-size: 20px;
+      margin: 10px;
+      padding: 15px 25px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #4caf50;
+      color: white;
+    }
+
+    .choices button:hover {
+      background: #45a049;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 22px;
+      min-height: 30px;
+    }
+
+    .score {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+
+    .reset {
+      margin-top: 25px;
+      padding: 10px 20px;
+      background: #f44336;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .reset:hover {
+      background: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Rock Paper Scissors</h1>
+  <p>Choose one option to play against the computer.</p>
+
+  <div class="choices">
+    <button onclick="play('Rock')">🪨 Rock</button>
+    <button onclick="play('Paper')">📄 Paper</button>
+    <button onclick="play('Scissors')">✂️ Scissors</button>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="score">
+    Player: <span id="playerScore">0</span> |
+    Computer: <span id="computerScore">0</span>
+  </div>
+
+  <button class="reset" onclick="resetGame()">Reset Game</button>
+
+  <script>
+    let playerScore = 0;
+    let computerScore = 0;
+
+    // Main game function
+    function play(playerChoice) {
+      const choices = ["Rock", "Paper", "Scissors"];
+      const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+      let outcome = "";
+
+      if (playerChoice === computerChoice) {
+        outcome = "It's a tie!";
+      } else if (
+        (playerChoice === "Rock" && computerChoice === "Scissors") ||
+        (playerChoice === "Paper" && computerChoice === "Rock") ||
+        (playerChoice === "Scissors" && computerChoice === "Paper")
+      ) {
+        outcome = "You win!";
+        playerScore++;
+      } else {
+        outcome = "You lose!";
+        computerScore++;
+      }
+
+      document.getElementById("result").textContent =
+        `You chose ${playerChoice}. Computer chose ${computerChoice}. ${outcome}`;
+
+      updateScore();
+    }
+
+    // Updates score display
+    function updateScore() {
+      document.getElementById("playerScore").textContent = playerScore;
+      document.getElementById("computerScore").textContent = computerScore;
+    }
+
+    // Reset game
+    function resetGame() {
+      playerScore = 0;
+      computerScore = 0;
+      document.getElementById("result").textContent = "";
+      updateScore();
+    }
+  </script>
+
+</body>
+</html>
