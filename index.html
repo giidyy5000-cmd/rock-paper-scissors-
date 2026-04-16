@@ -1,128 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Rock Paper Scissors</title>
+  <meta charset="UTF-8">
+  <title>All Sports Trivia</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #1e1e2f;
+      background: #121212;
       color: white;
       text-align: center;
       padding: 30px;
     }
 
-    h1 {
-      margin-bottom: 10px;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #1e1e2f;
+      padding: 25px;
+      border-radius: 10px;
     }
 
-    .choices button {
-      font-size: 20px;
-      margin: 10px;
-      padding: 15px 25px;
-      cursor: pointer;
+    h1 {
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .category-btn {
       background: #4caf50;
       color: white;
     }
 
-    .choices button:hover {
-      background: #45a049;
+    .answer-btn {
+      background: #2196f3;
+      color: white;
     }
 
-    .result {
-      margin-top: 20px;
-      font-size: 22px;
-      min-height: 30px;
+    .next-btn {
+      background: #ff9800;
+      color: black;
+      display: none;
     }
 
     .score {
       margin-top: 15px;
       font-size: 18px;
     }
-
-    .reset {
-      margin-top: 25px;
-      padding: 10px 20px;
-      background: #f44336;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .reset:hover {
-      background: #d32f2f;
-    }
   </style>
 </head>
 <body>
 
-  <h1>Rock Paper Scissors</h1>
-  <p>Choose one option to play against the computer.</p>
+<div class="container">
+  <h1>🏆 All Sports Trivia</h1>
 
-  <div class="choices">
-    <button onclick="play('Rock')">🪨 Rock</button>
-    <button onclick="play('Paper')">📄 Paper</button>
-    <button onclick="play('Scissors')">✂️ Scissors</button>
+  <!-- CATEGORY SCREEN -->
+  <div id="categories">
+    <p>Select a category:</p>
+    <button class="category-btn" onclick="startCategory('football')">🏈 Football</button>
+    <button class="category-btn" onclick="startCategory('basketball')">🏀 Basketball</button>
+    <button class="category-btn" onclick="startCategory('soccer')">⚽ Soccer</button>
+    <button class="category-btn" onclick="startCategory('baseball')">⚾ Baseball</button>
+    <button class="category-btn" onclick="startCategory('general')">🏅 General Sports</button>
   </div>
 
-  <div class="result" id="result"></div>
-
-  <div class="score">
-    Player: <span id="playerScore">0</span> |
-    Computer: <span id="computerScore">0</span>
+  <!-- QUIZ SCREEN -->
+  <div id="quiz" style="display:none;">
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+    <div class="score" id="score"></div>
   </div>
+</div>
 
-  <button class="reset" onclick="resetGame()">Reset Game</button>
+<script>
+const data = {
+  football: [
+    { q: "How many players are on the field per team?", a: ["9","10","11","12"], c: 2 },
+    { q: "How many points is a touchdown worth?", a: ["3","6","7","8"], c: 1 },
+    { q: "What position throws the ball?", a: ["QB","RB","WR","LB"], c: 0 }
+  ],
+  basketball: [
+    { q: "How many players on the court per team?", a: ["4","5","6","7"], c: 1 },
+    { q: "How many points is a 3‑pointer?", a: ["2","3","4","5"], c: 1 },
+    { q: "What league is the NBA?", a: ["College","Pro","High School","Street"], c: 1 }
+  ],
+  soccer: [
+    { q: "How many players per team on the field?", a: ["9","10","11","12"], c: 2 },
+    { q: "What part of the body can't touch the ball?", a: ["Head","Chest","Feet","Hands"], c: 3 },
+    { q: "What is a soccer goal worth?", a: ["1","2","3","4"], c: 0 }
+  ],
+  baseball: [
+    { q: "How many strikes for an out?", a: ["2","3","4","5"], c: 1 },
+    { q: "How many bases are there?", a: ["3","4","5","6"], c: 1 },
+    { q: "What position throws most pitches?", a: ["Catcher","Pitcher","Shortstop","Outfielder"], c: 1 }
+  ],
+  general: [
+    { q: "How many Olympic rings are there?", a: ["4","5","6","7"], c: 1 },
+    { q: "What sport uses a shuttlecock?", a: ["Tennis","Badminton","Ping Pong","Squash"], c: 1 },
+    { q: "Which sport has touchdowns?", a: ["Basketball","Baseball","Football","Hockey"], c: 2 }
+  ]
+};
 
-  <script>
-    let playerScore = 0;
-    let computerScore = 0;
+let category = [];
+let index = 0;
+let score = 0;
 
-    // Main game function
-    function play(playerChoice) {
-      const choices = ["Rock", "Paper", "Scissors"];
-      const computerChoice = choices[Math.floor(Math.random() * 3)];
+function startCategory(cat) {
+  category = data[cat];
+  index = 0;
+  score = 0;
+  document.getElementById("categories").style.display = "none";
+  document.getElementById("quiz").style.display = "block";
+  loadQuestion();
+}
 
-      let outcome = "";
+function loadQuestion() {
+  document.getElementById("nextBtn").style.display = "none";
+  const q = category[index];
+  document.getElementById("question").textContent = q.q;
 
-      if (playerChoice === computerChoice) {
-        outcome = "It's a tie!";
-      } else if (
-        (playerChoice === "Rock" && computerChoice === "Scissors") ||
-        (playerChoice === "Paper" && computerChoice === "Rock") ||
-        (playerChoice === "Scissors" && computerChoice === "Paper")
-      ) {
-        outcome = "You win!";
-        playerScore++;
-      } else {
-        outcome = "You lose!";
-        computerScore++;
-      }
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
 
-      document.getElementById("result").textContent =
-        `You chose ${playerChoice}. Computer chose ${computerChoice}. ${outcome}`;
+  q.a.forEach((text, i) => {
+    const btn = document.createElement("button");
+    btn.className = "answer-btn";
+    btn.textContent = text;
+    btn.onclick = () => checkAnswer(i);
+    answers.appendChild(btn);
+  });
+}
 
-      updateScore();
-    }
+function checkAnswer(i) {
+  if (i === category[index].c) score++;
+  document.getElementById("score").textContent =
+    `Score: ${score} / ${category.length}`;
+  document.getElementById("nextBtn").style.display = "block";
+}
 
-    // Updates score display
-    function updateScore() {
-      document.getElementById("playerScore").textContent = playerScore;
-      document.getElementById("computerScore").textContent = computerScore;
-    }
-
-    // Reset game
-    function resetGame() {
-      playerScore = 0;
-      computerScore = 0;
-      document.getElementById("result").textContent = "";
-      updateScore();
-    }
-  </script>
+function nextQuestion() {
+  index++;
+  if (index < category.length) {
+    loadQuestion();
+  } else {
+    document.getElementById("quiz").innerHTML =
+      `<h2>Finished!</h2>
+       <p>Your Score: ${score} / ${category.length}</p>
+       <button onclick="location.reload()">Play Again</button>`;
+  }
+}
+</script>
 
 </body>
 </html>
